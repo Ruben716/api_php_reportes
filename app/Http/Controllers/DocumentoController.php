@@ -105,5 +105,52 @@ private function esFecha($valor)
 }
 
 
+    // Convertir DOCX a PDF usando LibreOffice
+    // Asegúrate de que LibreOffice esté instalado y la ruta al ejecutable sea correcta
+    // Puedes usar exec() para ejecutar comandos del sistema
+    // Asegúrate de que el servidor tenga permisos para ejecutar comandos del sistema
+    public function convertirDocxAPdf(Request $request)
+    {
+        // Ruta de la plantilla en el almacenamiento
+        $templatePath = storage_path('app/plantillas/plantilla.docx');
 
+        // Validar que la plantilla exista
+        if (!file_exists($templatePath)) {
+            return response()->json([
+                'message' => 'Plantilla no encontrada.',
+            ], 404);
+        }
+
+        // Obtener la ruta del directorio de salida del request
+        $outputDir = $request->input('directorio_salida');
+
+        // Validar que el directorio de salida sea una ruta válida
+        if (!is_dir($outputDir)) {
+            return response()->json([
+                'message' => 'Directorio de salida no válido.',
+            ], 400);
+        }
+
+        // Ruta al ejecutable de LibreOffice
+        $sofficePath = '"C:\\Program Files\\LibreOffice\\program\\soffice.exe"';
+
+        // Construir el comando
+        $command = "$sofficePath --headless --convert-to pdf --outdir \"$outputDir\" \"$templatePath\"";
+
+        // Ejecutar el comando
+        exec($command, $output, $return_var);
+
+        // Verificar si hubo algún error
+        if ($return_var === 0) {
+            return response()->json([
+                'message' => '¡Conversión exitosa!',
+                'pdf_path' => $outputDir . '\\' . pathinfo($templatePath, PATHINFO_FILENAME) . '.pdf'
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Hubo un error en la conversión',
+                'error_details' => $output
+            ], 500);
+        }
+    }
 }

@@ -13,3 +13,5 @@ Route::get('/user', function (Request $request) {
 Route::post('/generar-doc', [DocumentoController::class, 'generarDoc']);
 
 Route::post('/generar-excel', [DocumentoController::class, 'generarExcelDinamico']);
+
+Route::post('/convertir-docx-a-pdf', [DocumentoController::class, 'convertirDocxAPdf']);
